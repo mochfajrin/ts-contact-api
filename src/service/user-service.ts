@@ -3,6 +3,7 @@ import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import {
   toUserResponse,
+  UserLoginRequest,
   type CreateUserRequest,
   type UserResponse,
 } from "../model/user-model";
@@ -32,5 +33,23 @@ export class UserService {
     });
 
     return toUserResponse(user);
+  }
+  static async function(request: UserLoginRequest): Promise<UserLoginRequest> {
+    const loginRequest = Validation.validate(UserValidation.LOGIN, request);
+    const user = await prismaClient.user.findUnique({
+      where: { username: loginRequest.username },
+    });
+
+    if (!user) {
+      throw new ResponseError(401, "Username or Password is wrong");
+    }
+    const isPasswordValid = await Bcrypt.compare(
+      loginRequest.password,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      throw new ResponseError(401, "Username or Password is wrong");
+    }
   }
 }

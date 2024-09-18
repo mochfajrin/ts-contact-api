@@ -7,6 +7,6 @@ web.use(express.json());
 web.use(publicRouter);
 web.use(errorMiddleware);
 
-web.listen(3000, () => {
+export const server = web.listen(8080, () => {
   console.log("server is listening");
 });
