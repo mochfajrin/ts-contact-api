@@ -1,4 +1,4 @@
-import { v7 as uuid } from "uuid";
+import { v7 as uuid, v4 as token } from "uuid";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 import {
@@ -9,7 +9,7 @@ import {
 } from "../model/user-model";
 import { UserValidation } from "../validation/user-validation";
 import { Validation } from "../validation/validation";
-import { Bcrypt } from "../utils/bcrypt";
+import { Bcrypt } from "../lib/bcrypt";
 
 export class UserService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
@@ -34,9 +34,9 @@ export class UserService {
 
     return toUserResponse(user);
   }
-  static async function(request: UserLoginRequest): Promise<UserLoginRequest> {
+  static async login(request: UserLoginRequest): Promise<UserResponse> {
     const loginRequest = Validation.validate(UserValidation.LOGIN, request);
-    const user = await prismaClient.user.findUnique({
+    let user = await prismaClient.user.findUnique({
       where: { username: loginRequest.username },
     });
 
@@ -51,5 +51,15 @@ export class UserService {
     if (!isPasswordValid) {
       throw new ResponseError(401, "Username or Password is wrong");
     }
+
+    user = await prismaClient.user.update({
+      where: { username: loginRequest.username },
+      data: {
+        token: token(),
+      },
+    });
+    const response = toUserResponse(user);
+    response.token = user.token!;
+    return response;
   }
 }
