@@ -1,7 +1,8 @@
 import supertest from "supertest";
-import { server, web } from "../src/application/web";
+import { web } from "../src/application/web";
 import { logger } from "../src/application/logger";
 import { UserTest } from "./test-util";
+import { Bcrypt } from "../src/lib/bcrypt";
 
 describe("POST /api/v1/users", () => {
   afterEach(async () => {
@@ -14,7 +15,7 @@ describe("POST /api/v1/users", () => {
       password: "",
       name: "",
     });
-    // logger.debug(response.body);
+    logger.debug(response.body);
     expect(response.status).toBe(400);
     expect(response.body.errors).toBeDefined();
   });
@@ -24,7 +25,7 @@ describe("POST /api/v1/users", () => {
       password: "test",
       name: "test",
     });
-    // logger.debug(response.body);
+    logger.debug(response.body);
     expect(response.status).toBe(201);
     expect(response.body.data.username).toBe("test");
     expect(response.body.data.name).toBe("test");
@@ -59,6 +60,106 @@ describe("POST /api/v1/users/login", () => {
   });
 });
 
-afterEach(() => {
-  server.close();
+describe("GET /api/v1/users/current", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+  });
+  afterEach(async () => {
+    await UserTest.delete();
+  });
+  it("should be able to get user", async () => {
+    const response = await supertest(web)
+      .get("/api/v1/users/current")
+      .set("X-API-TOKEN", "test");
+    logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.username).toBe("test");
+    expect(response.body.data.name).toBe("test");
+  });
+  it("should reject get user if token invalid", async () => {
+    const response = await supertest(web)
+      .get("/api/v1/users/current")
+      .set("X-API-TOKEN", "wrong");
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+});
+
+describe("PATCH /api/v1/users/current", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+  });
+  afterEach(async () => {
+    await UserTest.delete();
+  });
+  it("should reject update user if request is invalid", async () => {
+    const response = await supertest(web)
+      .patch("/api/v1/users/current")
+      .set("X-API-TOKEN", "test")
+      .send({
+        username: "",
+        password: "",
+      });
+    logger.debug(response.body);
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeDefined();
+  });
+  it("should reject update user if token is wrong", async () => {
+    const response = await supertest(web)
+      .patch("/api/v1/users/current")
+      .set("X-API-TOKEN", "")
+      .send({
+        username: "test1",
+        password: "test1",
+      });
+    logger.debug(response.body);
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
+  it("should update user", async () => {
+    const response = await supertest(web)
+      .patch("/api/v1/users/current")
+      .set("X-API-TOKEN", "test")
+      .send({
+        name: "test",
+        password: "test1",
+      });
+    logger.debug(response.body);
+    const user = await UserTest.get();
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.name).toBe("test");
+    expect(await Bcrypt.compare("test1", user.password)).toBe(true);
+  });
+});
+
+describe("DELETE /api/v1/users/logout", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+  });
+  afterEach(async () => {
+    await UserTest.delete();
+  });
+  it("should be able to logout", async () => {
+    const response = await supertest(web)
+      .delete("/api/v1/users/logout")
+      .set("X-API-TOKEN", "test");
+    logger.debug(response.body);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toBe("OK");
+
+    const user = await UserTest.get();
+    expect(user.token).toBe(null);
+  });
+  it("should reject logout user if token is wrong", async () => {
+    const response = await supertest(web)
+      .delete("/api/v1/users/logout")
+      .set("X-API-TOKEN", "test1");
+    logger.debug(response.body);
+
+    expect(response.status).toBe(401);
+    expect(response.body.errors).toBeDefined();
+  });
 });

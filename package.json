@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage --forceExit --detectOpenHandles --maxWorkers=1",
     "dev": "npx nodemon -x ts-node -e ts -r tsconfig-paths/register --files src/application/web.ts"
   },
   "keywords": [],
