@@ -9,8 +9,8 @@ web.use(publicRouter);
 web.use(apiRouter);
 web.use(errorMiddleware);
 
-// if (process.env.NODE_ENV !== "test") {
-//   web.listen(3000, () => {
-//     console.log("server is listening");
-//   });
-// }
+if (process.env.NODE_ENV !== "test") {
+  web.listen(3000, () => {
+    console.log("server is listening");
+  });
+}
