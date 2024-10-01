@@ -15,6 +15,8 @@ export type CreateContactRequest = {
   phone?: string;
 };
 
+export type UpdateContactRequest = CreateContactRequest & { id: string };
+
 export function toContactResponse(contact: Contact): ContactResponse {
   return {
     id: contact.id,

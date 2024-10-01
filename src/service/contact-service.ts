@@ -1,9 +1,10 @@
 import { v7 as uuid } from "uuid";
-import { User } from "@prisma/client";
+import { Contact, User } from "@prisma/client";
 import {
   ContactResponse,
   CreateContactRequest,
   toContactResponse,
+  UpdateContactRequest,
 } from "../model/contact-model";
 import { ContactValidation } from "../validation/contact-validation";
 import { Validation } from "../validation/validation";
@@ -28,14 +29,37 @@ export class ContactService {
     });
     return toContactResponse(contact);
   }
-  static async get(user: User, id: string): Promise<ContactResponse> {
+  static async contactMustExist(
+    contactId: string,
+    userId: string
+  ): Promise<Contact> {
     const contact = await prismaClient.contact.findUnique({
-      where: { id, user_id: user.id },
+      where: { id: contactId, user_id: userId },
     });
-    console.log(contact);
     if (!contact) {
       throw new ResponseError(404, "Contact not found");
     }
+    return contact;
+  }
+  static async get(user: User, id: string): Promise<ContactResponse> {
+    const contact = await this.contactMustExist(id, user.id);
+    return toContactResponse(contact);
+  }
+  static async update(
+    user: User,
+    request: UpdateContactRequest
+  ): Promise<ContactResponse> {
+    const updateRequest = Validation.validate(
+      ContactValidation.UPDATE,
+      request
+    );
+    await this.contactMustExist(updateRequest.id, user.id);
+
+    const contact = await prismaClient.contact.update({
+      where: { user_id: user.id, id: updateRequest.id },
+      data: updateRequest,
+    });
+
     return toContactResponse(contact);
   }
 }

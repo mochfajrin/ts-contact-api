@@ -91,3 +91,46 @@ describe("GET /api/v1/contacts/:contactId", () => {
     expect(response.body.errors).toBeDefined();
   });
 });
+
+describe("PUT /api/v1/contact/:contactId", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await ContactTest.create();
+  });
+  afterEach(async () => {
+    await ContactTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should be able to update contact", async () => {
+    const contact = await ContactTest.get();
+    const response = await supertest(web)
+      .put(`/api/v1/contacts/${contact.id}`)
+      .set("X-API-TOKEN", "test")
+      .send({
+        first_name: "Dian",
+        last_name: "Wei",
+      });
+    logger.debug(response.body);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.first_name).toBe("Dian");
+    expect(response.body.data.last_name).toBe("Wei");
+  });
+  it("should reject update contact if request invalid", async () => {
+    const contact = await ContactTest.get();
+    const response = await supertest(web)
+      .put(`/api/v1/contacts/${contact.id}`)
+      .set("X-API-TOKEN", "test")
+      .send({
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone: "",
+      });
+    logger.debug(response.body);
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeDefined();
+  });
+});
