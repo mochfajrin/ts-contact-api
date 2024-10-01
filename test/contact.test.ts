@@ -134,3 +134,32 @@ describe("PUT /api/v1/contact/:contactId", () => {
     expect(response.body.errors).toBeDefined();
   });
 });
+
+describe("DELETE /api/v1/contact/:contactId", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await ContactTest.create();
+  });
+  afterEach(async () => {
+    await ContactTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should be able remove contact", async () => {
+    const contact = await ContactTest.get();
+    const response = await supertest(web)
+      .delete(`/api/v1/contacts/${contact.id}`)
+      .set("X-API-TOKEN", "test");
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toBe("OK");
+  });
+  it("should reject remove contact if contact not found", async () => {
+    const response = await supertest(web)
+      .delete(`/api/v1/contacts/0f28136b-d083-4e64-9c52-fe3f920fbc4a`)
+      .set("X-API-TOKEN", "test");
+
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+});
