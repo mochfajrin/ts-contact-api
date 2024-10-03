@@ -18,15 +18,15 @@ export class ContactTest {
       data: [
         {
           id: uuid(),
-          user_id: mockUser?.id!,
+          user_id: mockUser!.id,
           first_name: "youmu",
           last_name: "saigyouji",
           phone: "0881",
-          email: "youmu@gmail.com",
+          email: "youmu@example.com",
         },
         {
           id: uuid(),
-          user_id: mockUser?.id!,
+          user_id: mockUser!.id,
           first_name: "yuyuko",
         },
       ],
