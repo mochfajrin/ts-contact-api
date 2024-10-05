@@ -11,7 +11,7 @@ import { ContactValidation } from "../validation/contact-validation";
 import { Validation } from "../validation/validation";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
-import { Pageable } from "../model/page";
+import { Pageable } from "../model/page-model";
 
 export class ContactService {
   static async create(
