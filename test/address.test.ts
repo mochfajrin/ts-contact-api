@@ -109,9 +109,7 @@ describe("GET /api/v1/contacts/:contactId/addresses/:addressId", () => {
     const contact = await ContactTest.get();
 
     const response = await supertest(web)
-      .get(
-        `/api/v1/contacts/${contact.id}/addresses/0f28136b-d083-4e64-9c52-fe3f920fbc4a`
-      )
+      .get(`/api/v1/contacts/${contact.id}/addresses/0f28136b-d083-4e64-9c52-fe3f920fbc4a`)
       .set("X-API-TOKEN", "test");
     logger.debug(response.body);
 
@@ -122,10 +120,184 @@ describe("GET /api/v1/contacts/:contactId/addresses/:addressId", () => {
     const address = await AddressTest.get();
 
     const response = await supertest(web)
-      .get(
-        `/api/v1/contacts/0f28136b-d083-4e64-9c52-fe3f920fbc4a/addresses/${address?.id}`
-      )
+      .get(`/api/v1/contacts/0f28136b-d083-4e64-9c52-fe3f920fbc4a/addresses/${address?.id}`)
       .set("X-API-TOKEN", "test");
+    logger.debug(response.body);
+
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+});
+
+describe("PUT /api/v1/contacts/:contactId/addresses/:addressId", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await ContactTest.create();
+    await AddressTest.create();
+  });
+  afterEach(async () => {
+    await AddressTest.deleteAll();
+    await ContactTest.deleteAll();
+    await UserTest.delete();
+  });
+  it("should should be able update address", async () => {
+    const contact = await ContactTest.get();
+    const address = await AddressTest.get();
+
+    const response = await supertest(web)
+      .put(`/api/v1/contacts/${contact.id}/addresses/${address!.id}`)
+      .set("X-API-TOKEN", "test")
+      .send({
+        postal_code: "123456",
+        street: "Tengiri",
+        city: "Lamongan",
+        province: "East Java",
+        country: "Indonesia",
+      });
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.id).toBeDefined();
+    expect(response.body.data.postal_code).toBe("123456");
+    expect(response.body.data.street).toBe("Tengiri");
+    expect(response.body.data.city).toBe("Lamongan");
+    expect(response.body.data.province).toBe("East Java");
+    expect(response.body.data.country).toBe("Indonesia");
+  });
+  it("should reject update address if data is invalid", async () => {
+    const contact = await ContactTest.get();
+    const address = await AddressTest.get();
+
+    const response = await supertest(web)
+      .put(`/api/v1/contacts/${contact.id}/addresses/${address!.id}`)
+      .set("X-API-TOKEN", "test")
+      .send({
+        postal_code: "123456",
+        street: "Tengiri",
+        city: "Lamongan",
+        province: "East Java",
+        country: "",
+      });
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeDefined();
+  });
+  it("should reject update address if address is invalid", async () => {
+    const contact = await ContactTest.get();
+    const response = await supertest(web)
+      .put(`/api/v1/contacts/${contact.id}/addresses/0f28136b-d083-4e64-9c52-fe3f920fbc4a`)
+      .set("X-API-TOKEN", "test")
+      .send({
+        postal_code: "123456",
+        street: "Tengiri",
+        city: "Lamongan",
+        province: "East Java",
+        country: "Malaysia",
+      });
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+  it("should reject update address if address is invalid", async () => {
+    const address = await AddressTest.get();
+    const response = await supertest(web)
+      .put(`/api/v1/contacts/0f28136b-d083-4e64-9c52-fe3f920fbc4a/addresses/${address!.id}`)
+      .set("X-API-TOKEN", "test")
+      .send({
+        postal_code: "123456",
+        street: "Tengiri",
+        city: "Lamongan",
+        province: "East Java",
+        country: "Malaysia",
+      });
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+});
+
+describe("DELETE /api/v1/contacts/:contactId/addresses/:addressId", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await ContactTest.create();
+    await AddressTest.create();
+  });
+  afterEach(async () => {
+    await AddressTest.deleteAll();
+    await ContactTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should be able delete address", async () => {
+    const address = await AddressTest.get();
+    const contact = await ContactTest.get();
+    const response = await supertest(web)
+      .delete(`/api/v1/contacts/${contact.id}/addresses/${address!.id}`)
+      .set("X-API-TOKEN", "test");
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toBe("OK");
+  });
+  it("should reject delete address if address not found", async () => {
+    const contact = await ContactTest.get();
+    const response = await supertest(web)
+      .delete(`/api/v1/contacts/${contact.id}/addresses/0f28136b-d083-4e64-9c52-fe3f920fbc4a`)
+      .set("X-API-TOKEN", "test");
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+  it("should rejectdelete address if contact not found", async () => {
+    const address = await AddressTest.get();
+    const response = await supertest(web)
+      .delete(`/api/v1/contacts/0f28136b-d083-4e64-9c52-fe3f920fbc4a/addresses/${address?.id}`)
+      .set("X-API-TOKEN", "test");
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(404);
+    expect(response.body.errors).toBeDefined();
+  });
+});
+describe("GET /api/v1/contacts/:contactId/addresses/", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+    await ContactTest.create();
+    await AddressTest.create();
+  });
+  afterEach(async () => {
+    await AddressTest.deleteAll();
+    await ContactTest.deleteAll();
+    await UserTest.delete();
+  });
+
+  it("should be able to list addresses", async () => {
+    const contact = await ContactTest.get();
+    const response = await supertest(web)
+      .get(`/api/v1/contacts/${contact.id}/addresses`)
+      .set("X-API-TOKEN", "test");
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBe(1);
+  });
+  it("should reject if contact not found", async () => {
+    const response = await supertest(web)
+      .get(`/api/v1/contacts/0f28136b-d083-4e64-9c52-fe3f920fbc4a/addresses`)
+      .set("X-API-TOKEN", "test");
+
     logger.debug(response.body);
 
     expect(response.status).toBe(404);

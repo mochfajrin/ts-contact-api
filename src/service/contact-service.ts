@@ -14,14 +14,8 @@ import { ResponseError } from "../error/response-error";
 import { Pageable } from "../model/page-model";
 
 export class ContactService {
-  static async create(
-    user: User,
-    request: CreateContactRequest
-  ): Promise<ContactResponse> {
-    const createRequest = Validation.validate(
-      ContactValidation.CREATE,
-      request
-    );
+  static async create(user: User, request: CreateContactRequest): Promise<ContactResponse> {
+    const createRequest = Validation.validate(ContactValidation.CREATE, request);
     const contact = await prismaClient.contact.create({
       data: {
         id: uuid(),
@@ -31,10 +25,7 @@ export class ContactService {
     });
     return toContactResponse(contact);
   }
-  static async contactMustExist(
-    contactId: string,
-    userId: string
-  ): Promise<Contact> {
+  static async contactMustExist(contactId: string, userId: string): Promise<Contact> {
     const contact = await prismaClient.contact.findUnique({
       where: { id: contactId, user_id: userId },
     });
@@ -47,14 +38,8 @@ export class ContactService {
     const contact = await this.contactMustExist(id, user.id);
     return toContactResponse(contact);
   }
-  static async update(
-    user: User,
-    request: UpdateContactRequest
-  ): Promise<ContactResponse> {
-    const updateRequest = Validation.validate(
-      ContactValidation.UPDATE,
-      request
-    );
+  static async update(user: User, request: UpdateContactRequest): Promise<ContactResponse> {
+    const updateRequest = Validation.validate(ContactValidation.UPDATE, request);
     await this.contactMustExist(updateRequest.id, user.id);
 
     const contact = await prismaClient.contact.update({
@@ -74,12 +59,9 @@ export class ContactService {
   }
   static async search(
     user: User,
-    request: SearchContactRequest
+    request: SearchContactRequest,
   ): Promise<Pageable<ContactResponse>> {
-    const searchRequest = Validation.validate(
-      ContactValidation.SEARCH,
-      request
-    );
+    const searchRequest = Validation.validate(ContactValidation.SEARCH, request);
     const skip = (searchRequest.page - 1) * searchRequest.size;
     const filters: Array<Prisma.ContactWhereInput> = [];
 

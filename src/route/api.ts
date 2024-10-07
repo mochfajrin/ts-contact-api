@@ -20,15 +20,8 @@ apiRouter.delete("/api/v1/contacts/:contactId", ContactController.delete);
 apiRouter.get("/api/v1/contacts", ContactController.search);
 
 // address
-apiRouter.post(
-  "/api/v1/contacts/:contactId/addresses",
-  AddressController.create
-);
-apiRouter.get(
-  "/api/v1/contacts/:contactId/addresses/:addressId",
-  AddressController.get
-);
-apiRouter.patch(
-  "/api/v1/contacts/:contactId/addresses/:addressId",
-  AddressController.update
-);
+apiRouter.post("/api/v1/contacts/:contactId/addresses", AddressController.create);
+apiRouter.get("/api/v1/contacts/:contactId/addresses/:addressId", AddressController.get);
+apiRouter.put("/api/v1/contacts/:contactId/addresses/:addressId", AddressController.update);
+apiRouter.delete("/api/v1/contacts/:contactId/addresses/:addressId", AddressController.delete);
+apiRouter.get("/api/v1/contacts/:contactId/addresses/", AddressController.list);

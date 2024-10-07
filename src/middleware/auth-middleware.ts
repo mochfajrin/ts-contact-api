@@ -2,11 +2,7 @@ import { Response, NextFunction } from "express";
 import type { UserRequest } from "../types/user";
 import { prismaClient } from "../application/database";
 
-export const authMiddleware = async (
-  req: UserRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const authMiddleware = async (req: UserRequest, res: Response, next: NextFunction) => {
   const token = req.get("X-API-TOKEN");
 
   if (token) {

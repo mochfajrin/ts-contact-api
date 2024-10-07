@@ -13,15 +13,12 @@ describe("POST /api/v1/contacts", () => {
     await UserTest.delete();
   });
   it("should create new contact", async () => {
-    const response = await supertest(web)
-      .post("/api/v1/contacts")
-      .set("X-API-TOKEN", "test")
-      .send({
-        first_name: "reimu",
-        last_name: "hakurei",
-        email: "hakurei@gmail.com",
-        phone: "08816018033",
-      });
+    const response = await supertest(web).post("/api/v1/contacts").set("X-API-TOKEN", "test").send({
+      first_name: "reimu",
+      last_name: "hakurei",
+      email: "hakurei@gmail.com",
+      phone: "08816018033",
+    });
     logger.debug(response.body);
     expect(response.status).toBe(201);
     expect(response.body.data.first_name).toBe("reimu");
@@ -30,12 +27,9 @@ describe("POST /api/v1/contacts", () => {
     expect(response.body.data.phone).toBe("08816018033");
   });
   it("should create new contact when optional filled is empy", async () => {
-    const response = await supertest(web)
-      .post("/api/v1/contacts")
-      .set("X-API-TOKEN", "test")
-      .send({
-        first_name: "reimu",
-      });
+    const response = await supertest(web).post("/api/v1/contacts").set("X-API-TOKEN", "test").send({
+      first_name: "reimu",
+    });
     logger.debug(response.body);
     expect(response.status).toBe(201);
     expect(response.body.data.first_name).toBe("reimu");
@@ -44,15 +38,12 @@ describe("POST /api/v1/contacts", () => {
     expect(response.body.data.phone).toBe(null);
   });
   it("should reject create new contact if data is invalid", async () => {
-    const response = await supertest(web)
-      .post("/api/v1/contacts")
-      .set("X-API-TOKEN", "test")
-      .send({
-        first_name: "",
-        last_name: "",
-        email: "eko",
-        phone: "0881601803311111",
-      });
+    const response = await supertest(web).post("/api/v1/contacts").set("X-API-TOKEN", "test").send({
+      first_name: "",
+      last_name: "",
+      email: "eko",
+      phone: "0881601803311111",
+    });
     logger.debug(response.body);
     expect(response.status).toBe(400);
     expect(response.body.errors).toBeDefined();
@@ -174,9 +165,7 @@ describe("GET /api/v1/contacts", () => {
     await UserTest.delete();
   });
   it("should be able to search contact", async () => {
-    const response = await supertest(web)
-      .get("/api/v1/contacts")
-      .set("X-API-TOKEN", "test");
+    const response = await supertest(web).get("/api/v1/contacts").set("X-API-TOKEN", "test");
     logger.debug(response.body);
 
     expect(response.status).toBe(200);

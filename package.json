@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "node dist/src/main.js",
+    "build": "tsc",
     "test": "jest --coverage --forceExit --detectOpenHandles --maxWorkers=1",
-    "dev": "npx nodemon -x ts-node -e ts -r tsconfig-paths/register --files src/application/web.ts"
+    "format": "prettier . --write",
+    "dev": "nodemon -x ts-node -e ts -r tsconfig-paths/register --files src/application/web.ts"
   },
   "keywords": [],
   "author": "Mochammad Fajrin",
@@ -33,6 +36,7 @@
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
     "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
     "prisma": "^5.16.2",
     "supertest": "^7.0.0",
     "ts-node": "^10.9.2",

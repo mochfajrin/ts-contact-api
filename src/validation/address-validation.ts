@@ -13,6 +13,10 @@ export class AddressValidation {
     contact_id: z.string().min(1).max(100),
     id: z.string().min(1).max(100),
   });
+  static readonly DELETE: ZodType = z.object({
+    contact_id: z.string().min(1).max(100),
+    id: z.string().min(1).max(100),
+  });
   static readonly UPDATE: ZodType = z.object({
     id: z.string().min(1).max(100),
     contact_id: z.string().min(1).max(100),

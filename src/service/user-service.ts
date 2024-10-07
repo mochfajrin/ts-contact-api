@@ -15,10 +15,7 @@ import { User } from "@prisma/client";
 
 export class UserService {
   static async register(request: CreateUserRequest): Promise<UserResponse> {
-    const registerRequest = Validation.validate(
-      UserValidation.REGISTER,
-      request
-    );
+    const registerRequest = Validation.validate(UserValidation.REGISTER, request);
 
     const isUsernameExist = await prismaClient.user.count({
       where: { username: registerRequest.username },
@@ -45,10 +42,7 @@ export class UserService {
     if (!user) {
       throw new ResponseError(401, "Username or Password is wrong");
     }
-    const isPasswordValid = await Bcrypt.compare(
-      loginRequest.password,
-      user.password
-    );
+    const isPasswordValid = await Bcrypt.compare(loginRequest.password, user.password);
 
     if (!isPasswordValid) {
       throw new ResponseError(401, "Username or Password is wrong");
@@ -67,10 +61,7 @@ export class UserService {
   static async get(user: User): Promise<UserResponse> {
     return toUserResponse(user);
   }
-  static async update(
-    user: User,
-    request: UserUpdateRequest
-  ): Promise<UserResponse> {
+  static async update(user: User, request: UserUpdateRequest): Promise<UserResponse> {
     const updateRequest = Validation.validate(UserValidation.UPDATE, request);
     if (updateRequest.name) {
       user.name = updateRequest.name;

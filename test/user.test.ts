@@ -68,18 +68,14 @@ describe("GET /api/v1/users/current", () => {
     await UserTest.delete();
   });
   it("should be able to get user", async () => {
-    const response = await supertest(web)
-      .get("/api/v1/users/current")
-      .set("X-API-TOKEN", "test");
+    const response = await supertest(web).get("/api/v1/users/current").set("X-API-TOKEN", "test");
     logger.debug(response.body);
     expect(response.status).toBe(200);
     expect(response.body.data.username).toBe("test");
     expect(response.body.data.name).toBe("test");
   });
   it("should reject get user if token invalid", async () => {
-    const response = await supertest(web)
-      .get("/api/v1/users/current")
-      .set("X-API-TOKEN", "wrong");
+    const response = await supertest(web).get("/api/v1/users/current").set("X-API-TOKEN", "wrong");
     logger.debug(response.body);
     expect(response.status).toBe(401);
     expect(response.body.errors).toBeDefined();
@@ -142,9 +138,7 @@ describe("DELETE /api/v1/users/logout", () => {
     await UserTest.delete();
   });
   it("should be able to logout", async () => {
-    const response = await supertest(web)
-      .delete("/api/v1/users/logout")
-      .set("X-API-TOKEN", "test");
+    const response = await supertest(web).delete("/api/v1/users/logout").set("X-API-TOKEN", "test");
     logger.debug(response.body);
 
     expect(response.status).toBe(200);

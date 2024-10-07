@@ -14,6 +14,8 @@ export type GetAddressRequest = {
   id: string;
 };
 
+export type DeleteAddressRequest = GetAddressRequest;
+
 export type CreateAddressRequest = {
   contact_id: string;
   street?: string | null;
